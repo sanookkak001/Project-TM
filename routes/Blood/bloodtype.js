@@ -10,7 +10,7 @@ router.get("/", async (req,res) => {
         if (!BloodTypes.length) return res.status(404).send("Not found anything");
 
         const bloodtypeFormatted = BloodTypes.map(BloodType => ({
-            id : BloodTypes.id,
+            id : BloodType.id,
             bloodtype : BloodType.bloodtype,
             createdAt : BloodType.createdAt,
             updatedAt : BloodType.updatedAt
@@ -94,7 +94,9 @@ router.patch("/:id", async (req, res) => {
         await updatedBloodType.update(bloodtype);
 
         const BloodGtypeformated = {
-            bloodtype: updatedBloodType.bloodtype, 
+            id : updatedBloodType.id,
+            bloodtype: updatedBloodType.bloodtype,
+            createdAt : updatedBloodType.createdAt,      
             updatedAt: updatedBloodType.updatedAt
         };
 

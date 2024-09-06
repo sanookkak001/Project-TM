@@ -68,6 +68,7 @@ router.post("/", async (req, res) => {
 
         const educationformatted = {
             id: educationWithLevel.id,
+            personalinfo : educationWithLevel.personalinfo,
             education: educationWithLevel.EducationLevel ? educationWithLevel.EducationLevel.educationlevel : educationWithLevel.education,
             createdAt: educationWithLevel.createdAt,
             updatedAt: educationWithLevel.updatedAt,

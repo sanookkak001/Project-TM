@@ -1,18 +1,23 @@
 import express from 'express';
-import { HobbyGroup } from '../../models.js';
+import { HobbyGroup, Hobbylist } from '../../models.js';
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
     try {
-        const hobbyGroups = await HobbyGroup.findAll();
+        const hobbyGroups = await HobbyGroup.findAll({
+            include : [{
+                model : Hobbylist,
+                attributes : ['hobbylist']
+            }]
+        });
         
         if (hobbyGroups.length === 0) return res.status(404).send("No hobby groups found");
 
         const hobbyGroupsFormatted = hobbyGroups.map(hobby => ({
             id: hobby.id,
             personalinfo: hobby.personalinfo,
-            hobby: hobby.hobby,
+            hobby: hobby.Hobbylist.hobbylist ? hobby.Hobbylist.hobbylist : hobby.hobby,
             createdAt: hobby.createdAt,
             updatedAt: hobby.updatedAt
         }));
@@ -29,14 +34,19 @@ router.get("/:id", async (req, res) => {
     const hobbyId = req.params.id;
     
     try {
-        const hobbyGroup = await HobbyGroup.findByPk(hobbyId);
+        const hobbyGroup = await HobbyGroup.findByPk(hobbyId , {
+            include : [{
+                model : Hobbylist,
+                attributes : ['hobbylist']
+            }]
+        });
         
         if (!hobbyGroup)  return res.status(404).send("Hobby group not found");
 
         const hobbyGroupFormatted = {
             id: hobbyGroup.id,
             personalinfo: hobbyGroup.personalinfo,
-            hobby: hobbyGroup.hobby,
+            hobby: hobbyGroup.Hobbylist.hobbylist ? hobbyGroup.Hobbylist.hobbylist : hobbyGroup.hobby,
             createdAt: hobbyGroup.createdAt,
             updatedAt: hobbyGroup.updatedAt
         };
@@ -55,12 +65,20 @@ router.post("/", async (req,res) => {
 
         const newhobbygroup = await HobbyGroup.create({ personalinfo , hobby });
 
+
+        const QueryHobby = await HobbyGroup.findByPk(newhobbygroup.id , {
+            include : [{
+                model :  Hobbylist,
+                attributes : ['hobbylist']
+            }]
+        })
+
         const newhobbyformate = {
-            id : newhobbygroup.id,
-            personalinfo : newhobbygroup.personalinfo,
-            hobby  : newhobbygroup.hobby,
-            createdAt : newhobbygroup.createdAt,
-            updatedAt : newhobbygroup.updatedAt
+            id : QueryHobby.id,
+            personalinfo : QueryHobby.personalinfo,
+            hobby  : QueryHobby.Hobbylist.hobbylist ? QueryHobby.Hobbylist.hobbylist : QueryHobby.hobby ,
+            createdAt : QueryHobby.createdAt,
+            updatedAt : QueryHobby.updatedAt
         };
 
         res.status(200).send(newhobbyformate);
@@ -75,7 +93,12 @@ router.patch("/:id", async (req, res) => {
     const hobbyGroupId = req.params.id;
     try {
         // Find the hobby group by primary key
-        const hobbyGroup = await HobbyGroup.findByPk(hobbyGroupId);
+        const hobbyGroup = await HobbyGroup.findByPk(hobbyGroupId , {
+            include : [{
+                model : Hobbylist,
+                attributes : ['hobbylist']
+            }]
+        });
         if (!hobbyGroup) {
             return res.status(400).send("ID not Found");
         };
@@ -84,11 +107,12 @@ router.patch("/:id", async (req, res) => {
         const data = req.body;
         await hobbyGroup.update(data);
 
+
         // Prepare the response format
         const patchFormat = {
             id: hobbyGroup.id,
             personalinfo: hobbyGroup.personalinfo,
-            hobby : hobbyGroup.hobby,
+            hobby : hobbyGroup.Hobbylist.hobbylist ? hobbyGroup.Hobbylist.hobbylist : hobbyGroup.hobby,
             createdAt: hobbyGroup.createdAt,
             updatedAt: hobbyGroup.updatedAt,
         };

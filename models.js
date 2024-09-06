@@ -253,6 +253,102 @@ export const Education = sequelize.define("Education" , {
 });
 
 
+// Zodiaclist Zone
+
+export const Zodiaclist = sequelize.define("Zodiaclist" , {
+    zodiaclist : {
+        type : DataTypes.STRING,
+        allowNull : false,
+        unique : true
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        get() {
+            return formatDateT(this.getDataValue('createdAt'));
+        }
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        get() {
+            return formatDateT(this.getDataValue('updatedAt'));
+        }
+    }
+
+} , {
+    tableName : "zodiaclist"
+});
+
+
+// Zodiac 
+
+export const Zodiac = sequelize.define("Zodiac" , {
+    personalinfo: {
+        type: DataTypes.INTEGER,
+        unique: true,
+        references: {
+            model: PersonalInfo,
+            key: "id"
+        }
+    },
+    zodiac : {
+        type : DataTypes.INTEGER,
+        allowNull : false,
+        unique : false
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        get() {
+            return formatDateT(this.getDataValue('createdAt'));
+        }
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        get() {
+            return formatDateT(this.getDataValue('updatedAt'));
+        }
+    }
+} , {
+    tableName : "zodiac"
+});
+
+export const Image = sequelize.define("Image" , {
+    personalinfo : {
+        type : DataTypes.INTEGER,
+        allowNull : false,
+        unique : false,
+        references : {
+            model : PersonalInfo,
+            key : 'id'
+        }
+    },
+    image : {
+        type : DataTypes.STRING,
+        allowNull : false,
+        unique : false
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        get() {
+            return formatDateT(this.getDataValue('createdAt'));
+        }
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        get() {
+            return formatDateT(this.getDataValue('updatedAt'));
+        }
+    }
+} , {
+    tableName : "image"
+});
+
+
 // Helper functions
 
 function padZero(num) {
@@ -291,3 +387,18 @@ Education.belongsTo(EducationLevel, { foreignKey : "education"});
 
 PersonalInfo.hasOne(Education, { foreignKey : "personalinfo", onUpdate: "CASCADE", onDelete: "CASCADE" });
 Education.belongsTo(PersonalInfo, { foreignKey: "personalinfo", onUpdate: "CASCADE", onDelete: "CASCADE" });
+
+// Define Zodiac to Zodiaclist
+
+Zodiaclist.hasMany(Zodiac ,  { foreignKey : "zodiac" , onUpdate: "CASCADE", onDelete: "CASCADE" });  
+Zodiac.belongsTo(Zodiaclist ,  { foreignKey : "zodiac" , onUpdate: "CASCADE", onDelete: "CASCADE" });  
+
+// Define PersonalInfo to Zodiac
+
+PersonalInfo.hasOne(Zodiac, { foreignKey : "personalinfo", onUpdate: "CASCADE", onDelete: "CASCADE" });
+Zodiac.belongsTo(PersonalInfo, { foreignKey: "personalinfo", onUpdate: "CASCADE", onDelete: "CASCADE" });
+
+// Define PersonalInfo to Image
+
+PersonalInfo.hasMany(Image , { foreignKey : "personalinfo", onUpdate : "CASCADE" , onUpdate : "CASCADE"});
+Image.belongsTo(PersonalInfo , { foreignKey : "personalinfo", onUpdate : "CASCADE" , onUpdate : "CASCADE"});
