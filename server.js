@@ -1,6 +1,7 @@
 import express from 'express';
 import { configDotenv } from 'dotenv';
-import {sequelize, Zodiac } from '../gf/models.js';
+import cors from 'cors';
+import { sequelize } from '../gf/models.js';
 import PersonalInforouter from '../gf/routes/personalinfo.js';
 import BloodTyperouter from './routes/Blood/bloodtype.js';
 import BloodGrouprouter from './routes/Blood/bloodgroup.js';
@@ -14,6 +15,7 @@ import Imagerouter from "./routes/Image/Image.js";
 configDotenv();
 const { Port } = process.env;
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 
@@ -28,9 +30,14 @@ app.use('/zodiaclist' , Zodiaclistrouter);
 app.use('/zodiac' , Zodiacrouter);
 app.use('/image', Imagerouter);
 
+app.use(cors({
+    origin: 'http://localhost:3001', // Replace with your frontend URL
+  }));
+  
 app.get('/',(req,res)=>{
     res.send("Hello World");
 });
+
 
 
 app.listen(`${Port}`, async()=>{

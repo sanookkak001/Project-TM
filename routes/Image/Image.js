@@ -1,17 +1,22 @@
 import express from 'express';
-import { Image } from '../../models.js';
+import { Image, PersonalInfo } from '../../models.js';
 
 const router = express.Router();
 
 
 router.get('/' , async (req,res) => {
     try {
-        const image = await Image.findAll();
+        const image = await Image.findAll({
+            include : [{
+                model : PersonalInfo,
+                attributes : ["firstname"]
+            }]
+        });
         if(image.length === 0) return res.status(400).send("Not Data to fetch");
         const imageformatted = image.map( image => ({
             id : image.id,
-            personalinfo : image.image,
-            image : image.zodiaclist,
+            personalinfo : image.personalinfo,
+            image : image.image,
             createdAt : image.createdAt,
             updatedAt : image.updatedAt,
         }));
@@ -30,8 +35,8 @@ router.get("/:id", async (req, res) => {
 
         const imageidformatted = {
             id : image.id,
-            personalinfo : image.image,
-            image : image.zodiaclist,
+            personalinfo : image.personalinfo,
+            image : image.image,
             createdAt: image.createdAt,
             updatedAt: image.updatedAt,
         };
